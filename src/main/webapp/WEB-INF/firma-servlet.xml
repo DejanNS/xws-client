@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<!-- Declare a view resolver 
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:prefix="/WEB-INF/" p:suffix=".jsp" />
+	-->
+
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+
+	<bean id="xmlViewer"
+		class="org.springframework.web.servlet.view.xml.MarshallingView">
+		<constructor-arg>
+			<bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+				<property name="classesToBeBound">
+					<list>
+						<value>org.firma.client.oxm.proverastanja.ProveraStanjaResponse</value>
+					</list>
+				</property>
+			</bean>
+		</constructor-arg>
+	</bean>
+
+</beans>

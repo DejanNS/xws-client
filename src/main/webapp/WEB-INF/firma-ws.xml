@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:sws="http://www.springframework.org/schema/web-services"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       				http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       				http://www.springframework.org/schema/util 
+       				http://www.springframework.org/schema/util/spring-util-3.0.xsd
+       	 			http://www.springframework.org/schema/web-services
+       				http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+       				http://www.springframework.org/schema/oxm 
+       				http://www.springframework.org/schema/oxm/spring-oxm-1.5.xsd">
+
+	<bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate"
+		p:marshaller-ref="jaxbMarshaller" p:unmarshaller-ref="jaxbMarshaller"
+		p:defaultUri="http://localhost:8081/banka-ws-provider/ws"
+		p:messageSender-ref="messageSender">
+		<constructor-arg ref="messageFactory" />
+		<property name="interceptors">
+			<list>
+				<ref bean="securityInterceptor" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="messageSender"
+		class="org.springframework.ws.transport.http.CommonsHttpMessageSender" />
+
+	<bean id="messageFactory" class="org.springframework.ws.soap.saaj.SaajSoapMessageFactory">
+		<property name="soapVersion">
+			<util:constant static-field="org.springframework.ws.soap.SoapVersion.SOAP_11" />
+		</property>
+	</bean>
+
+	<bean id="jaxbMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller"
+		p:contextPath="org.firma.client.oxm.proverastanja" />
+
+	<bean id="securityInterceptor"
+		class="org.springframework.ws.soap.security.xwss.XwsSecurityInterceptor">
+		<property name="secureRequest" value="true" />
+		<property name="validateRequest" value="true" />
+		<property name="secureResponse" value="false" />
+		<property name="validateResponse" value="false" />
+		<property name="policyConfiguration" value="/WEB-INF/securityPolicy.xml" />
+		<property name="callbackHandlers">
+			<list>
+				<bean id="keyStoreHandler"
+					class="org.springframework.ws.soap.security.xwss.callback.KeyStoreCallbackHandler">
+					<property name="keyStore" ref="keyStore" />
+					<property name="defaultAlias" value="firma1" />
+					<property name="privateKeyPassword" value="x" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="keyStore"
+		class="org.springframework.ws.soap.security.support.KeyStoreFactoryBean">
+		<property name="location" value="/WEB-INF/jks/firma1.jks" />
+		<property name="password" value="x" />
+	</bean>
+
+</beans>
